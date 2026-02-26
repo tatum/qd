@@ -2,6 +2,7 @@
 name = "qd"
 version = "0.1.0"
 description = "Quick diff review tool for recent git changes"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.0",
