@@ -121,3 +121,34 @@ def get_file_diff(ref_range: str, path: str) -> str:
 def get_commit_info(ref_range: str) -> list[tuple[str, str]]:
     raw = _run_git("log", "--oneline", "--first-parent", ref_range)
     return parse_log_oneline(raw)
+
+
+@dataclass
+class CommitDetail:
+    hash: str
+    message: str
+    files: list[str]
+
+
+def get_commit_log(ref_range: str) -> list[CommitDetail]:
+    """Get commits with their changed files."""
+    raw = _run_git(
+        "log", "--first-parent", "--pretty=format:%h %s", "--name-only", ref_range
+    )
+    return parse_commit_log(raw)
+
+
+def parse_commit_log(raw: str) -> list[CommitDetail]:
+    if not raw.strip():
+        return []
+    commits: list[CommitDetail] = []
+    blocks = raw.strip().split("\n\n")
+    for block in blocks:
+        lines = block.strip().split("\n")
+        if not lines:
+            continue
+        header = lines[0]
+        hash_, _, message = header.partition(" ")
+        files = [l for l in lines[1:] if l.strip()]
+        commits.append(CommitDetail(hash=hash_, message=message, files=files))
+    return commits

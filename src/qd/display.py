@@ -5,7 +5,7 @@ from rich.table import Table
 from rich.syntax import Syntax
 from rich.text import Text
 
-from qd.git import FileStat
+from qd.git import CommitDetail, FileStat
 
 console = Console()
 
@@ -64,6 +64,17 @@ def print_summary(
         f"[green]{total_ins} insertion{'s' if total_ins != 1 else ''}[/green], "
         f"[red]{total_del} deletion{'s' if total_del != 1 else ''}[/red]\n"
     )
+
+
+def print_log(commits: list[CommitDetail]) -> None:
+    if not commits:
+        console.print("[yellow]No commits found[/yellow]")
+        return
+    for commit in commits:
+        console.print(f"  [bold yellow]{commit.hash}[/bold yellow] {commit.message}")
+        for f in commit.files:
+            console.print(f"    [dim]{f}[/dim]")
+    console.print()
 
 
 def print_hint() -> None:
